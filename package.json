@@ -1,0 +1,20 @@
+{
+  "name": "mastodon-viewer",
+  "version": "1.0.0",
+  "description": "神崎はよPC買え",
+  "repository": "https://github.com/yuzulabo/mastodon-viewer.git",
+  "author": "nzws <git@nzws.me>",
+  "license": "MPL-2.0",
+  "private": true,
+  "scripts": {
+    "build": "parcel build src/index.html",
+    "dev": "parcel src/index.html"
+  },
+  "dependencies": {
+    "hyperapp": "^1.2.9"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.3",
+    "sass": "^1.17.4"
+  }
+}
