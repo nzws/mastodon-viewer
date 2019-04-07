@@ -1,24 +1,30 @@
 import { h, app } from 'hyperapp';
 import '../style/index.scss';
 
-const domParser = new DOMParser();
-
 const INSTANCE_DOMAIN = 'friends.nico';
+// const INSTANCE_DOMAIN = 'knzk.me'; // テスト用
+
+const domParser = new DOMParser();
+const spaceRegExp = /( | )/gim;
+const linkRegExp = /(https?:\/\/[-_.!~*\'()a-zA-Z0-9;\/?:@&=+$,%#]+)/gim;
 
 const state = {
   toots: []
 };
 
 const actions = {
-  add: (payload, use_push = false) => {
-    payload.content = domParser.parseFromString(payload.content, 'text/html').documentElement.textContent;
-    if (!payload.content) return state; // 画像のみは弾く
+  add: (data) => {
+    const payload = data.toot;
+    payload.content = domParser.parseFromString(payload.content, 'text/html').documentElement.textContent.replace(linkRegExp, '');
+
+    // 画像のみ / スペースのみ / CW付きは読み込まない
+    if (!payload.content || !payload.content.replace(spaceRegExp, '') || payload.spoiler_text) return state;
 
     if (!payload.account.display_name) {
       payload.account.display_name = payload.account.username;
     }
 
-    if (use_push) {
+    if (data.use_push) {
       state.toots.push(payload);
     } else {
       state.toots.unshift(payload);
@@ -56,7 +62,10 @@ fetch(`https://${INSTANCE_DOMAIN}/api/v1/timelines/public?local=true`,{
   }
 }).then(json => {
   json.forEach(toot => {
-    knzk.add(toot, true);
+    knzk.add({
+      toot,
+      use_push: true
+    });
   });
 
   const ws = new WebSocket(`wss://${INSTANCE_DOMAIN}/api/v1/streaming?stream=public:local`);
@@ -68,8 +77,8 @@ fetch(`https://${INSTANCE_DOMAIN}/api/v1/timelines/public?local=true`,{
       const resdata = JSON.parse(data.data);
 
       if (resdata.event === 'update') {
-        const payload = JSON.parse(resdata.payload);
-        knzk.add(payload);
+        const toot = JSON.parse(resdata.payload);
+        knzk.add({toot});
       }
     };
 
