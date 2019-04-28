@@ -1,7 +1,7 @@
 import { h, app } from 'hyperapp';
 import '../style/index.scss';
 
-const INSTANCE_DOMAIN = 'friends.nico';
+const INSTANCE_DOMAIN = 'best-friends.chat';
 // const INSTANCE_DOMAIN = 'knzk.me'; // テスト用
 
 const domParser = new DOMParser();
